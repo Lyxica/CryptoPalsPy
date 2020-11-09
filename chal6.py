@@ -4,6 +4,7 @@ import base64
 from functools import reduce
 from funcs import *
 from typing import *
+
 import SingleCharXor
 
 
