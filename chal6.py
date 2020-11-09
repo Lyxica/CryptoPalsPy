@@ -55,7 +55,10 @@ if __name__ == "__main__":
                 transposed[i] = [b]
     for i, b in enumerate(blocks[-1:]):
         transposed[i].append(b)
-
+    decryption_key = []
     for key in transposed.keys():
+        tv = TextView.from_ascii("".join(transposed[key]))
+        results = SingleCharXor.scan_and_sort(tv)
+        decryption_key.append(results[0][1])
+    print("".join(map(chr, decryption_key)))
 
-        SingleCharXor.scan_and_sort(transposed[key])

@@ -14,6 +14,8 @@ Plaintext = NewType('Plaintext', str)
 
 
 def has_invalid_ascii(input: str) -> bool:
+    return False
+    print(input)
     for ch in input:
         if ch == '\n':
             continue
@@ -67,17 +69,7 @@ def otp_xor(data: TextView, key: TextView) -> TextView:
 
 def scan_and_sort(target: TextView):
     items = xor_scan(target)
-    o = []
-    for tup in items:
-        _bytes = tup[0].get_ascii()
-        contains_bad_ascii = reduce(lambda a, b: a or (b < ' ' or b > '~'), _bytes, False)
-        if not contains_bad_ascii:
-            o.append(tup)
-        else:
-            o.append(tup)
-
-    items = chi_sort(o)
-    return items
+    return chi_sort(items)
 
 if __name__ == '__main__':
     target = from_hexstr('1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736')
