@@ -1,20 +1,32 @@
-from SingleCharXor import scan_and_sort, chi_sort
+from SingleCharXor import scan_and_sort
+from Histogram import Histogram
 from TextView import from_ascii, from_hexstr, TextView, chunks
+import time
+from typing import Iterable, Sequence
+
+import multiprocessing
 
 
-def singlebyte_xor_scan_file_cipher_list(inputf, outputf):
-    file = open(inputf, 'r')
-    ciphers = map(lambda x: x.strip(), file.readlines())
+def f(x):
+    return scan_and_sort(from_hexstr(x))
 
-    o = []
-    for ciph in ciphers:
-        tv = from_hexstr(ciph)
-        results = scan_and_sort(tv)
-        if len(results) == 0:
-            continue
-        o.append(results[0])
-    o = chi_sort(o)
 
-    with open(outputf, 'w', encoding='utf8') as f:
-        for view in o:
-            f.write("{0}\n-------------------------------\n".format(view[0].get_ascii()))
+def extract_bytes(item: tuple[TextView, int]) -> bytes:
+    return item[0].get_bytes()
+
+
+def singlebyte_xor_scan_file_cipher_list(inputf, len: int = 5) -> Sequence:
+    with open(inputf, 'r') as file:
+        ciphers = map(lambda x: x.strip(), file.readlines())
+
+    with multiprocessing.Pool() as pool:
+        o = pool.map(f , ciphers)
+
+    flattened = []
+    for sub_list in o:
+        flattened.extend(sub_list)
+
+    histogram = Histogram()
+    sorted_items = sorted(flattened, key=lambda x: histogram.score(x[0].get_bytes()))
+
+    return sorted_items[:len]

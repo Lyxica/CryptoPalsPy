@@ -1,50 +1,66 @@
 from __future__ import annotations
-import typing
-import struct
+from typing import Union, TypeVar, Sequence
+#from collections.abc import Sequence
+import binascii
+import itertools
 
-HexStr = typing.NewType('HexStr', str)  # Looks like this: '68656c6c6f20776f726c64' -> hello world
+T = TypeVar('T')
 
-def chunks(l, n):
+
+def chunks(l: bytes, n: int) -> Sequence[bytes]:
     n = max(1, n)
-    return (l[i:i+n] for i in range(0, len(l), n))
+    return [l[i:i+n] for i in range(0, len(l), n)]
 
 
 class TextView:
-    text: str
+    data: bytes
 
-    def __init__(self, ascii_str: str):
-        self.text = ascii_str
+    def __init__(self, data: bytes):
+        self.data = data
 
     def __len__(self):
-        return len(self.text)
+        return len(self.data)
 
     def get_ascii(self) -> str:
-        return self.text
+        return "".join(map(chr, self.data))
 
-    def get_hexstr(self) -> HexStr:
-        return HexStr("".join(list(map(lambda x: "{0:02x}".format(ord(x)), self.text))))
+    def get_hexstr(self) -> str:
+        return binascii.hexlify(self.data).decode('utf8')
 
     def get_bytes(self) -> bytes:
-        return self.text.encode('utf8')
-        return bytes(bytearray(self.text, 'utf8'))
+        return self.data
+
+    def __iter__(self):
+        return iter(self.data)
+
+    def __xor__(self, other: TextView):
+        if type(other) != TextView:
+            raise TypeError("type(other) != TextView")
+
+        items = zip(self.data, itertools.cycle(other.data))
+        return TextView(bytes(map(lambda x: x[0] ^ x[1], items)))
+
+    def __eq__(self, other: Union[str, TextView]):
+
+        if type(other) != str and type(other) != TextView:
+            raise TypeError("type(other) != str and type(other) != TextView")
+
+        if type(other) == str:
+            pair_bytes = zip(self.data, from_hexstr(other).data)
+        else:
+            pair_bytes = zip(self.data, other.data)
+
+        return len(list(filter(lambda x: x[0] != x[1], pair_bytes))) == 0
 
 
 def from_ascii(ascii: str) -> TextView:
-    return TextView(ascii)
+    return TextView(ascii.encode('utf8'))
 
 
-def from_hexstr(hexstr: HexStr) -> TextView:
-    assert(len(hexstr) % 2 == 0)
-    chars = chunks(hexstr, 2)
-    int_chars = map(lambda x: int(x, 16), chars)
-    ascii_str = "".join(map(lambda x: chr(x), int_chars))
-    return TextView(ascii_str)
-
+def from_hexstr(hexstr: str) -> TextView:
+    return TextView(binascii.unhexlify(hexstr))
 
 if __name__ == "__main__":
-    x = TextView("Hello World")
-    print(x.get_ascii())
-    print(x.get_hexstr())
-    n = x.get_bytes()
-    print(n)
-    print(hex(n[0] ^ n[1]))
+    x = from_hexstr("1c0111001f010100061a024b53535009181c")
+    y = from_hexstr("686974207468652062756c6c277320657965")
+    assert(x ^ y == "746865206b696420646f6e277420706c6179")

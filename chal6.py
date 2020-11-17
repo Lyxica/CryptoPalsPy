@@ -1,29 +1,31 @@
-from typing import List, Tuple
 import TextView
 import base64
-from functools import reduce
-from funcs import *
-from typing import *
-
+from typing import TypeVar
+from collections.abc import Callable, Sequence, Sized
 import SingleCharXor
+from itertools import islice
+from operator import eq
+from functools import partial
+import multiprocessing
 
-
-def hamming_distance(a: str, b: str) -> int:
+def hamming_distance(a: bytes, b: bytes) -> int:
     assert(len(a) == len(b))
 
-    def str2bin(char: str):
-        return "{0:08b}".format(ord(char))
+    def int2binstr(char: int):
+        return "{0:08b}".format(char)
 
-    a_prime = "".join(map(str2bin, a))
-    b_prime = "".join(map(str2bin, b))
+    a_prime = "".join(map(int2binstr, a))
+    b_prime = "".join(map(int2binstr, b))
     zipped = zip(a_prime, b_prime)
 
     return len(list(filter(lambda x: x[0] != x[1], zipped)))
 
 
-def find_keylen(cipher: str, max_key_len: int = 40, result_count: int = 100) -> List[Tuple[int, float]]:
+def find_keylen(cipher: bytes, max_key_len: int = 40, result_count: int = 100) -> list[tuple[int, float]]:
+    def same_size(a: Sized, b: Sized):
+        return len(a) == len(b)
 
-    def slide(items: List[str], f: Callable[[str, str], int]) -> int:
+    def slide(items: Sequence[bytes], f: Callable[[bytes, bytes], int]) -> int:
         if len(items) <= 1:
             return 0
 
@@ -31,35 +33,36 @@ def find_keylen(cipher: str, max_key_len: int = 40, result_count: int = 100) -> 
 
     distances = []
     for key_len in range(2, max_key_len):
-        blocks = list(TextView.chunks(cipher, key_len))
-        filtered_blocks = list(filter(lambda x: len(x) == len(blocks[0]), blocks))[:50]
+        blocks = TextView.chunks(cipher, key_len)
+        filtered_blocks = filter(partial(same_size, blocks[0]), blocks)
 
-        dist = slide(filtered_blocks, hamming_distance) / key_len
+        dist = slide(list(filtered_blocks)[:50], hamming_distance) / key_len
         distances.append((key_len, dist))
 
     return distances[:result_count]
 
+def get_key_ch(data: bytes) -> int:
+        tv = TextView.TextView(data)
+        results = SingleCharXor.scan_and_sort(tv)
+        return results[0][1]
 
-if __name__ == "__main__":
-    data = open('6.txt', 'r').read()
-    ascii = "".join(map(chr, base64.b64decode(data)))
-    distances = find_keylen(ascii)
+def crack_repeating_xor(data: bytes):
+    distances = find_keylen(data)
     likely_keylen = sorted(distances, key=lambda x: x[1])[0][0]
-    blocks = list(TextView.chunks(ascii, likely_keylen))
+    blocks = TextView.chunks(data, likely_keylen)
     transposed = {}
 
-    for block in blocks[:-1]:
+    for block in blocks:
         for i, b in enumerate(block):
             try:
                 transposed[i].append(b)
             except KeyError:
                 transposed[i] = [b]
-    for i, b in enumerate(blocks[-1:]):
-        transposed[i].append(b)
-    decryption_key = []
-    for key in transposed.keys():
-        tv = TextView.from_ascii("".join(transposed[key]))
-        results = SingleCharXor.scan_and_sort(tv)
-        decryption_key.append(results[0][1])
-    print("".join(map(chr, decryption_key)))
 
+    list_of_transposed_blocks = []
+    for key in transposed.keys():
+        list_of_transposed_blocks.append(transposed[key])
+
+    with multiprocessing.Pool() as pool:
+        key_chars = pool.map(get_key_ch, list_of_transposed_blocks)
+        return "".join(map(chr, key_chars))

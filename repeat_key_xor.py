@@ -1,7 +1,6 @@
 import TextView
 
 
-
 def encryptdecrypt(pt, key) -> TextView:
     output = []
     key_len = len(key)
