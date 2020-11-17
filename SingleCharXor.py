@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import NewType
-from TextView import TextView, from_ascii, from_hexstr
+from CipherText import CipherText, from_ascii, from_hexstr
 from Histogram import Histogram
 import time
 
@@ -22,13 +22,13 @@ def has_invalid_ascii(input: str) -> bool:
     return False
 
 
-def xor_scan(data: TextView) -> list[tuple[TextView, int]]:
+def xor_scan(data: CipherText) -> list[tuple[CipherText, int]]:
     byte_len = len(data)
     raw_xors = []
     for i in range(256):
         # ih = hex(i)[2:]
         # key = "{0:02x}".format(i)
-        deciphered = otp_xor(data, TextView(bytes([i] * byte_len)))
+        deciphered = otp_xor(data, CipherText(bytes([i] * byte_len)))
         # if i == 118:
         #     print(deciphered.get_ascii())
         if has_invalid_ascii(deciphered.get_ascii()):
@@ -39,11 +39,11 @@ def xor_scan(data: TextView) -> list[tuple[TextView, int]]:
     return raw_xors
 
 
-def otp_xor(data: TextView, key: TextView) -> TextView:
+def otp_xor(data: CipherText, key: CipherText) -> CipherText:
     return data ^ key
 
 
-def scan_and_sort(target: TextView, len: int = 5):
+def scan_and_sort(target: CipherText, len: int = 5):
     items = xor_scan(target)
     histogram = Histogram(mode="ENGLISH")
     scored_items = sorted(items, key=lambda x: histogram.score(x[0].get_bytes()))

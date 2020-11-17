@@ -1,4 +1,4 @@
-import TextView
+import CipherText
 import base64
 from typing import TypeVar
 from collections.abc import Callable, Sequence, Sized
@@ -33,7 +33,7 @@ def find_keylen(cipher: bytes, max_key_len: int = 40, result_count: int = 100) -
 
     distances = []
     for key_len in range(2, max_key_len):
-        blocks = TextView.chunks(cipher, key_len)
+        blocks = CipherText.chunks(cipher, key_len)
         filtered_blocks = filter(partial(same_size, blocks[0]), blocks)
 
         dist = slide(list(filtered_blocks)[:50], hamming_distance) / key_len
@@ -42,14 +42,14 @@ def find_keylen(cipher: bytes, max_key_len: int = 40, result_count: int = 100) -
     return distances[:result_count]
 
 def get_key_ch(data: bytes) -> int:
-        tv = TextView.TextView(data)
+        tv = CipherText.CipherText(data)
         results = SingleCharXor.scan_and_sort(tv)
         return results[0][1]
 
 def crack_repeating_xor(data: bytes):
     distances = find_keylen(data)
     likely_keylen = sorted(distances, key=lambda x: x[1])[0][0]
-    blocks = TextView.chunks(data, likely_keylen)
+    blocks = CipherText.chunks(data, likely_keylen)
     transposed = {}
 
     for block in blocks:

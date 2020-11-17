@@ -1,6 +1,6 @@
 from SingleCharXor import scan_and_sort
 from Histogram import Histogram
-from TextView import from_ascii, from_hexstr, TextView, chunks
+from CipherText import from_ascii, from_hexstr, CipherText, chunks
 import time
 from typing import Iterable, Sequence
 
@@ -11,7 +11,7 @@ def f(x):
     return scan_and_sort(from_hexstr(x))
 
 
-def extract_bytes(item: tuple[TextView, int]) -> bytes:
+def extract_bytes(item: tuple[CipherText, int]) -> bytes:
     return item[0].get_bytes()
 
 

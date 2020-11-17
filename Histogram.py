@@ -1,4 +1,4 @@
-import TextView
+import CipherText
 from typing import Iterable, TypeVar, Sequence
 import time
 import functools

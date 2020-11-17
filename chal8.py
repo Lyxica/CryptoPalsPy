@@ -1,4 +1,4 @@
-import TextView
+import CipherText
 from typing import Union, Literal
 import Histogram
 import SingleCharXor
@@ -8,7 +8,7 @@ import itertools
 
 
 def find_repeat_blocks(block_size: int, data: bytes) -> Union[None, tuple[int, bytes]]:
-    chunked_blocks = TextView.chunks(data, block_size // 8)
+    chunked_blocks = CipherText.chunks(data, block_size // 8)
 
     for k, g in itertools.groupby(sorted(chunked_blocks)):
         if len(list(g)) > 1:

@@ -1,5 +1,5 @@
 import unittest
-import TextView
+import CipherText
 import SingleCharXor
 import singlebyte_xor_scan_file_cipher_list
 import chal6
@@ -17,22 +17,22 @@ class ChallengeTests(unittest.TestCase):
 
     # Implementation tests
     def test_xor(self):
-        a = TextView.from_hexstr('1234')
-        b = TextView.from_hexstr('1234')
-        c = TextView.from_hexstr('0000')
+        a = CipherText.from_hexstr('1234')
+        b = CipherText.from_hexstr('1234')
+        c = CipherText.from_hexstr('0000')
 
         self.assertEqual(a ^ b, '0000')
         self.assertEqual(a ^ b, c)
 
     # Challenge tests
     def test_challenge2(self):
-        a = TextView.from_hexstr('1c0111001f010100061a024b53535009181c')
-        b = TextView.from_hexstr('686974207468652062756c6c277320657965')
+        a = CipherText.from_hexstr('1c0111001f010100061a024b53535009181c')
+        b = CipherText.from_hexstr('686974207468652062756c6c277320657965')
 
         self.assertEqual(a ^ b, '746865206b696420646f6e277420706c6179', )
 
     def test_challenge3(self):
-        a = TextView.from_hexstr("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736")
+        a = CipherText.from_hexstr("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736")
         results = SingleCharXor.scan_and_sort(a)
 
         self.assertEqual(results[0][0].get_ascii(), "Cooking MC's like a pound of bacon")
@@ -43,8 +43,8 @@ class ChallengeTests(unittest.TestCase):
         self.assertIn("Now that the party is jumping\n", list(results))
 
     def test_challenge5(self):
-        a = TextView.from_ascii("Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal")
-        b = TextView.from_ascii("ICE")
+        a = CipherText.from_ascii("Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal")
+        b = CipherText.from_ascii("ICE")
 
         self.assertEqual(a ^ b, "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f")
 
