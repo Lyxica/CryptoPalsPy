@@ -38,7 +38,7 @@ class ChallengeTests(unittest.TestCase):
         self.assertEqual(results[0][0].get_ascii(), "Cooking MC's like a pound of bacon")
 
     def test_challenge4(self):
-        items = singlebyte_xor_scan_file_cipher_list.singlebyte_xor_scan_file_cipher_list('chal4.txt')
+        items = singlebyte_xor_scan_file_cipher_list.singlebyte_xor_scan_file_cipher_list('ChallengeFiles/4.txt')
         results = map(lambda x: x[0].get_ascii(), items)
         self.assertIn("Now that the party is jumping\n", list(results))
 
@@ -49,13 +49,13 @@ class ChallengeTests(unittest.TestCase):
         self.assertEqual(a ^ b, "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f")
 
     def test_challenge6(self):
-        with open('6.txt', 'r') as data:
+        with open('ChallengeFiles/6.txt', 'r') as data:
             decoded_data = base64.b64decode(data.read())
             x = chal6.crack_repeating_xor(decoded_data)
             self.assertEqual(x, 'Terminator X: Bring the noise')
 
     def test_challenge8(self):
-        with open('8.txt', 'r') as data:
+        with open('ChallengeFiles/8.txt', 'r') as data:
             byte_lines = map(compose(binascii.unhexlify, str.strip), data.readlines())
             results = list(filter(None, map(chal8.detect_ecb_in_cipher, byte_lines)))
             self.assertEqual(len(results), 1)
