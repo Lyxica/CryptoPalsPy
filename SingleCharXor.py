@@ -11,7 +11,6 @@ Plaintext = NewType('Plaintext', str)
 
 def has_invalid_ascii(input: str) -> bool:
     return False
-    print(input)
     for ch in input:
         if ch == '\n':
             continue
@@ -48,11 +47,3 @@ def scan_and_sort(target: CipherText, len: int = 5):
     histogram = Histogram(mode="ENGLISH")
     scored_items = sorted(items, key=lambda x: histogram.score(x[0].get_bytes()))
     return scored_items[:len]
-
-if __name__ == '__main__':
-    target = from_hexstr('1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736')
-    o = scan_and_sort(target)
-    for item in o:
-        data, key = item
-        o = data.get_ascii()
-        print("".join(o) + " -> " + chr(key))

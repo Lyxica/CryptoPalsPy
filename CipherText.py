@@ -13,15 +13,6 @@ class CipherText:
     def __len__(self):
         return len(self.data)
 
-    def get_ascii(self) -> str:
-        return "".join(map(chr, self.data))
-
-    def get_hexstr(self) -> str:
-        return binascii.hexlify(self.data).decode('utf8')
-
-    def get_bytes(self) -> bytes:
-        return self.data
-
     def __iter__(self):
         return iter(self.data)
 
@@ -44,15 +35,19 @@ class CipherText:
 
         return len(list(filter(lambda x: x[0] != x[1], pair_bytes))) == 0
 
+    def get_ascii(self) -> str:
+        return "".join(map(chr, self.data))
 
-def from_ascii(ascii: str) -> CipherText:
-    return CipherText(ascii.encode('utf8'))
+    def get_hexstr(self) -> str:
+        return binascii.hexlify(self.data).decode('utf8')
+
+    def get_bytes(self) -> bytes:
+        return self.data
+
+
+def from_ascii(ascii_data: str) -> CipherText:
+    return CipherText(ascii_data.encode('utf8'))
 
 
 def from_hexstr(hexstr: str) -> CipherText:
     return CipherText(binascii.unhexlify(hexstr))
-
-if __name__ == "__main__":
-    x = from_hexstr("1c0111001f010100061a024b53535009181c")
-    y = from_hexstr("686974207468652062756c6c277320657965")
-    assert(x ^ y == "746865206b696420646f6e277420706c6179")
