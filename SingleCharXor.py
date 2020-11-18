@@ -9,15 +9,10 @@ Key = NewType('Key', str)
 Plaintext = NewType('Plaintext', str)
 
 
-def has_invalid_ascii(input: str) -> bool:
-    return False
-    for ch in input:
-        if ch == '\n':
-            continue
-        if ch == '\r':
-            continue
-        if ch < ' ' or ch > '~':
-            return True
+def simple_filter(data: bytes) -> bool:
+    bytes_above_128 = filter(lambda x: x > 128, data)
+    if any(bytes_above_128):
+        return True
     return False
 
 
@@ -30,7 +25,7 @@ def xor_scan(data: CipherText) -> list[tuple[CipherText, int]]:
         deciphered = otp_xor(data, CipherText(bytes([i] * byte_len)))
         # if i == 118:
         #     print(deciphered.get_ascii())
-        if has_invalid_ascii(deciphered.get_ascii()):
+        if simple_filter(deciphered.get_bytes()):
             continue
 
         raw_xors.append((deciphered, i))
