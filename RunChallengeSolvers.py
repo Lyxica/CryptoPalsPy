@@ -2,7 +2,7 @@ import unittest
 import CipherText
 import SingleCharXor
 import RepeatKeyXor
-import chal8
+import DetectECB
 import base64
 import binascii
 from Utils import compose
@@ -54,7 +54,7 @@ class ChallengeTests(unittest.TestCase):
     def test_challenge8(self):
         with open('ChallengeFiles/8.txt', 'r') as data:
             byte_lines = map(compose(binascii.unhexlify, str.strip), data.readlines())
-            results = list(filter(None, map(chal8.detect_ecb_in_cipher, byte_lines)))
+            results = list(filter(None, map(DetectECB.detect_ecb, byte_lines)))
             self.assertEqual(len(results), 1)
 
             key_size, cipher = results[0]
