@@ -16,15 +16,18 @@ class CipherText:
     def __iter__(self):
         return iter(self.data)
 
-    def __xor__(self, other: CipherText):
-        if type(other) != CipherText:
-            raise TypeError("type(other) != TextView")
+    def __xor__(self, other: Union[CipherText, int]):
+        if isinstance(other, CipherText):
+            key = itertools.cycle(other.data)
+        elif isinstance(other, int):
+            key = itertools.repeat(other)
+        else:
+            raise TypeError("Unsupported parameter type")
 
-        items = zip(self.data, itertools.cycle(other.data))
+        items = zip(self.data, key)
         return CipherText(bytes(map(lambda x: x[0] ^ x[1], items)))
 
     def __eq__(self, other: Union[str, CipherText]):
-
         if type(other) != str and type(other) != CipherText:
             raise TypeError("type(other) != str and type(other) != TextView")
 

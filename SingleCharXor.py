@@ -19,17 +19,13 @@ def xor_scan(data: CipherText) -> list[tuple[CipherText, int]]:
     byte_len = len(data)
     raw_xors = []
     for i in range(256):
-        deciphered = otp_xor(data, CipherText(bytes([i] * byte_len)))
+        deciphered = data ^ i
         if simple_filter(deciphered.get_bytes()):
             continue
 
         raw_xors.append((deciphered, i))
 
     return raw_xors
-
-
-def otp_xor(data: CipherText, key: CipherText) -> CipherText:
-    return data ^ key
 
 
 def scan_and_sort(target: CipherText, len: int = 5):
