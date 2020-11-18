@@ -40,7 +40,7 @@ def find_keylen(cipher: bytes, max_key_len: int = 40, result_count: int = 100) -
 
 def get_key_ch(data: bytes) -> int:
     tv = CipherText.CipherText(data)
-    results = SingleCharXor.scan_and_sort(tv)
+    results = SingleCharXor.recover_plaintext(tv)
     return results[0][1]
 
 

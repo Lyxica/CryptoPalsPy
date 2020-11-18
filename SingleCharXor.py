@@ -1,7 +1,10 @@
 from __future__ import annotations
 from typing import NewType
+from collections.abc import Sequence, Iterable
 from CipherText import CipherText
 from Histogram import Histogram
+from functools import singledispatch
+import multiprocessing
 
 HexStr = NewType('HexStr', str)
 Key = NewType('Key', str)
@@ -27,8 +30,29 @@ def _xor_scan(data: CipherText) -> list[tuple[CipherText, int]]:
     return raw_xors
 
 
-def scan_and_sort(target: CipherText, return_len: int = 5):
-    items = _xor_scan(target)
+@singledispatch
+def recover_plaintext(data, return_len: int = 5):
+    raise TypeError("Unknown parameter type: {0}".format(type(data)))
+
+
+@recover_plaintext.register
+def _(data: CipherText, return_len: int = 5):
+    items = _xor_scan(data)
     histogram = Histogram(mode="ENGLISH")
     scored_items = sorted(items, key=lambda x: histogram.score(x[0].get_bytes()))
     return scored_items[:return_len]
+
+
+@recover_plaintext.register(Iterable)
+def _(data: Iterable[CipherText], return_len: int = 5) -> Sequence[tuple[CipherText, str]]:
+    with multiprocessing.Pool() as pool:
+        o = pool.map(recover_plaintext, data)
+
+    flattened = []
+    for sub_list in o:
+        flattened.extend(sub_list)
+
+    histogram = Histogram()
+    sorted_items = sorted(flattened, key=lambda x: histogram.score(x[0].get_bytes()))
+
+    return sorted_items[:return_len]

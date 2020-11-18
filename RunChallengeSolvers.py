@@ -1,7 +1,6 @@
 import unittest
 import CipherText
 import SingleCharXor
-import singlebyte_xor_scan_file_cipher_list
 import chal6
 import chal8
 import base64
@@ -29,14 +28,14 @@ class ChallengeTests(unittest.TestCase):
 
     def test_challenge3(self):
         a = CipherText.from_hexstr("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736")
-        results = SingleCharXor.scan_and_sort(a)
+        results = SingleCharXor.recover_plaintext(a)
 
         self.assertEqual(results[0][0].get_ascii(), "Cooking MC's like a pound of bacon")
 
     def test_challenge4(self):
         with open('ChallengeFiles/4.txt', 'r') as file:
-            cipher = map(str.strip, file.readlines())
-            items = Vigenere.singlebyte_xor_scan_file_cipher_list(cipher)
+            cipher = map(compose(CipherText.from_hexstr, str.strip), file.readlines())
+            items = SingleCharXor.recover_plaintext(cipher)
             results = map(lambda x: x[0].get_ascii(), items)
             self.assertIn("Now that the party is jumping\n", list(results))
 
