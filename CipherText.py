@@ -4,11 +4,6 @@ import binascii
 import itertools
 
 
-def chunks(l: bytes, n: int) -> Sequence[bytes]:
-    n = max(1, n)
-    return [l[i:i+n] for i in range(0, len(l), n)]
-
-
 class CipherText:
     data: bytes
 

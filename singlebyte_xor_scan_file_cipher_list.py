@@ -1,6 +1,6 @@
 from SingleCharXor import scan_and_sort
 from Histogram import Histogram
-from CipherText import from_ascii, from_hexstr, CipherText, chunks
+from CipherText import from_ascii, from_hexstr, CipherText
 import time
 from typing import Iterable, Sequence
 
