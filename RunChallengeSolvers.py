@@ -1,7 +1,7 @@
 import unittest
 import CipherText
 import SingleCharXor
-import chal6
+import RepeatKeyXor
 import chal8
 import base64
 import binascii
@@ -48,7 +48,7 @@ class ChallengeTests(unittest.TestCase):
     def test_challenge6(self):
         with open('ChallengeFiles/6.txt', 'r') as data:
             decoded_data = base64.b64decode(data.read())
-            x = chal6.crack_repeating_xor(decoded_data)
+            x = RepeatKeyXor.recover_key(decoded_data)
             self.assertEqual(x, 'Terminator X: Bring the noise')
 
     def test_challenge8(self):

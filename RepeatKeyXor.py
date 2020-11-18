@@ -10,7 +10,7 @@ import multiprocessing
 import Utils
 
 
-def hamming_distance(a: bytes, b: bytes) -> int:
+def _hamming_distance(a: bytes, b: bytes) -> int:
     assert(len(a) == len(b))
 
     def int2binstr(char: int):
@@ -23,7 +23,7 @@ def hamming_distance(a: bytes, b: bytes) -> int:
     return len(list(filter(lambda x: x[0] != x[1], zipped)))
 
 
-def find_keylen(cipher: bytes, max_key_len: int = 40, result_count: int = 100) -> list[tuple[int, float]]:
+def _find_keylen(cipher: bytes, max_key_len: int = 40, result_count: int = 100) -> list[tuple[int, float]]:
     def same_size(a: Sized, b: Sized):
         return len(a) == len(b)
 
@@ -32,20 +32,20 @@ def find_keylen(cipher: bytes, max_key_len: int = 40, result_count: int = 100) -
         blocks = Utils.chunks(cipher, key_len)
         filtered_blocks = filter(partial(same_size, blocks[0]), blocks)
 
-        dist = Utils.slide(list(filtered_blocks)[:50], hamming_distance) / key_len
+        dist = Utils.slide(list(filtered_blocks)[:50], _hamming_distance) / key_len
         distances.append((key_len, dist))
 
     return distances[:result_count]
 
 
-def get_key_ch(data: bytes) -> int:
+def __get_key_ch(data: bytes) -> int:
     tv = CipherText.CipherText(data)
     results = SingleCharXor.recover_plaintext(tv)
     return results[0][1]
 
 
-def crack_repeating_xor(data: bytes):
-    distances = find_keylen(data)
+def recover_key(data: bytes):
+    distances = _find_keylen(data)
     likely_keylen = sorted(distances, key=lambda x: x[1])[0][0]
     blocks = Utils.chunks(data, likely_keylen)
     transposed = {}
@@ -62,5 +62,5 @@ def crack_repeating_xor(data: bytes):
         list_of_transposed_blocks.append(transposed[key])
 
     with multiprocessing.Pool() as pool:
-        key_chars = pool.map(get_key_ch, list_of_transposed_blocks)
+        key_chars = pool.map(__get_key_ch, list_of_transposed_blocks)
         return "".join(map(chr, key_chars))
