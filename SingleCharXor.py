@@ -1,8 +1,7 @@
 from __future__ import annotations
 from typing import NewType
-from CipherText import CipherText, from_ascii, from_hexstr
+from CipherText import CipherText
 from Histogram import Histogram
-import time
 
 HexStr = NewType('HexStr', str)
 Key = NewType('Key', str)
@@ -20,11 +19,7 @@ def xor_scan(data: CipherText) -> list[tuple[CipherText, int]]:
     byte_len = len(data)
     raw_xors = []
     for i in range(256):
-        # ih = hex(i)[2:]
-        # key = "{0:02x}".format(i)
         deciphered = otp_xor(data, CipherText(bytes([i] * byte_len)))
-        # if i == 118:
-        #     print(deciphered.get_ascii())
         if simple_filter(deciphered.get_bytes()):
             continue
 
