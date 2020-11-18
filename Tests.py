@@ -6,11 +6,7 @@ import chal6
 import chal8
 import base64
 import binascii
-from functools import reduce
-
-
-def compose(*functions):
-    return reduce(lambda f, g: lambda x: f(g(x)), functions, lambda x: x)
+from Utils import compose
 
 
 class ChallengeTests(unittest.TestCase):

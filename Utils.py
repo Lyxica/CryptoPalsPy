@@ -1,5 +1,6 @@
 from collections.abc import Sequence, Callable
 from typing import TypeVar, Union
+from functools import reduce
 
 T = TypeVar('T')
 K = TypeVar('K')
@@ -16,3 +17,7 @@ def slide(items: Sequence[T], f: Callable[[T, T], K]) -> K:
         return 0
 
     return f(items[0], items[1]) + slide(items[1:], f)
+
+
+def compose(*functions):
+    return reduce(lambda f, g: lambda x: f(g(x)), functions, lambda x: x)
