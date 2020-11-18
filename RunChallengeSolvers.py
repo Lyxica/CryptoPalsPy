@@ -34,9 +34,11 @@ class ChallengeTests(unittest.TestCase):
         self.assertEqual(results[0][0].get_ascii(), "Cooking MC's like a pound of bacon")
 
     def test_challenge4(self):
-        items = singlebyte_xor_scan_file_cipher_list.singlebyte_xor_scan_file_cipher_list('ChallengeFiles/4.txt')
-        results = map(lambda x: x[0].get_ascii(), items)
-        self.assertIn("Now that the party is jumping\n", list(results))
+        with open('ChallengeFiles/4.txt', 'r') as file:
+            cipher = map(str.strip, file.readlines())
+            items = Vigenere.singlebyte_xor_scan_file_cipher_list(cipher)
+            results = map(lambda x: x[0].get_ascii(), items)
+            self.assertIn("Now that the party is jumping\n", list(results))
 
     def test_challenge5(self):
         a = CipherText.from_ascii("Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal")

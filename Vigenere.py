@@ -15,12 +15,9 @@ def extract_bytes(item: tuple[CipherText, int]) -> bytes:
     return item[0].get_bytes()
 
 
-def singlebyte_xor_scan_file_cipher_list(inputf, len: int = 5) -> Sequence:
-    with open(inputf, 'r') as file:
-        ciphers = map(lambda x: x.strip(), file.readlines())
-
+def singlebyte_xor_scan_file_cipher_list(data, return_len: int = 5) -> Sequence:
     with multiprocessing.Pool() as pool:
-        o = pool.map(f , ciphers)
+        o = pool.map(__f, data)
 
     flattened = []
     for sub_list in o:
