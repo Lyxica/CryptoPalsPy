@@ -65,42 +65,13 @@ class Histogram:
 
         return o
 
-    def sort(self, data: Sequence[bytes]):
-        histograms = map(self.__create_histogram, data)
-        scored_data = self.__score_items(histograms)
-        sorted_data = sorted(scored_data, key=lambda x: x[0])
-
-        return list(map(lambda x: x[0], sorted_data))
-
     def score(self, data: bytes):
-        histogram = self.__create_histogram(data)
-        return self.__score(histogram)
-
-    def chi(self, w, f):
-        return pow(f - w, 2) / w
-
-    def __score(self, freqs):
+        freqs = self.__create_histogram(data)
         n = 0
         for key in range(256):
             n += self.chi(self.base[key], freqs[key])
         return n
 
+    def chi(self, w, f):
+        return pow(f - w, 2) / w
 
-    def score_items(self, data: Sequence[bytes]):
-        histograms = map(self.__create_histogram, data)
-        scored_data = self.__score_items(histograms)
-        scores = map(lambda x: x[0], scored_data)
-        scored_sequence = list(map(lambda x: (x[0], x[1]), zip(scores, data)))
-        return scored_sequence
-
-    def __score_items(self, items):
-        def chi(w, f):
-            return pow(f - w, 2) / w
-
-        def score(freqs):
-            n = 0
-            for key in range(256):
-                n += chi(self.base[key], freqs[key])
-            return n
-
-        return map(lambda x: (score(x), x), items)
