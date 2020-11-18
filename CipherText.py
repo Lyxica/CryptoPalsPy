@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Union, TypeVar, Sequence
+from typing import Union
 import binascii
 import itertools
 
