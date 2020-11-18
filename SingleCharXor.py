@@ -8,19 +8,18 @@ Key = NewType('Key', str)
 Plaintext = NewType('Plaintext', str)
 
 
-def simple_filter(data: bytes) -> bool:
+def __simple_filter(data: bytes) -> bool:
     bytes_above_128 = filter(lambda x: x > 128, data)
     if any(bytes_above_128):
         return True
     return False
 
 
-def xor_scan(data: CipherText) -> list[tuple[CipherText, int]]:
-    byte_len = len(data)
+def _xor_scan(data: CipherText) -> list[tuple[CipherText, int]]:
     raw_xors = []
     for i in range(256):
         deciphered = data ^ i
-        if simple_filter(deciphered.get_bytes()):
+        if __simple_filter(deciphered.get_bytes()):
             continue
 
         raw_xors.append((deciphered, i))
@@ -28,8 +27,8 @@ def xor_scan(data: CipherText) -> list[tuple[CipherText, int]]:
     return raw_xors
 
 
-def scan_and_sort(target: CipherText, len: int = 5):
-    items = xor_scan(target)
+def scan_and_sort(target: CipherText, return_len: int = 5):
+    items = _xor_scan(target)
     histogram = Histogram(mode="ENGLISH")
     scored_items = sorted(items, key=lambda x: histogram.score(x[0].get_bytes()))
-    return scored_items[:len]
+    return scored_items[:return_len]
